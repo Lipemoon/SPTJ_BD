@@ -1,0 +1,20 @@
+meta {
+  name: Tournament
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/sptj/tournament
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Torneio de Narutin",
+    "gameOrigin": "Naruto Shippuden Ultimate Ninja Storm 4",
+    "categoryByGenre": "M",
+    "format": "1v1"
+  }
+}
