@@ -3,6 +3,7 @@ package com.example.SPTJ_BD.configuration
 import com.example.SPTJ_BD.controller.CharacterController
 import com.example.SPTJ_BD.controller.TournamentController
 import com.example.SPTJ_BD.repository.CharacterRepository
+import com.example.SPTJ_BD.repository.CharacterTeamRepository
 import com.example.SPTJ_BD.repository.TournamentRepository
 import com.example.SPTJ_BD.service.CharacterService
 import com.example.SPTJ_BD.service.TournamentService
@@ -32,9 +33,10 @@ class SptjConfiguration {
         return new Random()
     }
 
+
     @Bean
-    TournamentService tournamentService(TournamentRepository tournamentRepository, Random random, CharacterRepository characterRepository) {
-        return new TournamentService(tournamentRepository, random, characterRepository)
+    TournamentService tournamentService(TournamentRepository tournamentRepository, Random random, CharacterRepository characterRepository, CharacterTeamRepository characterTeamRepository) {
+        return new TournamentService(tournamentRepository, random, characterRepository, characterTeamRepository)
     }
 
 }

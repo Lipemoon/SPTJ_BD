@@ -1,19 +1,22 @@
 package com.example.SPTJ_BD.controller
 import com.example.SPTJ_BD.entity.CharacterEntity
 import com.example.SPTJ_BD.entity.TournamentEntity
-import com.example.SPTJ_BD.model.InvalidFormatTournamentException
-import com.example.SPTJ_BD.model.InvalidGenderException
+import com.example.SPTJ_BD.model.exception.CharacterNotFoundException
+import com.example.SPTJ_BD.model.exception.InvalidFormatTournamentException
+import com.example.SPTJ_BD.model.exception.InvalidGenderException
 import com.example.SPTJ_BD.model.output.ResponseChooseWinner
 import com.example.SPTJ_BD.model.output.ResponseTournament
 import com.example.SPTJ_BD.model.output.ResponseTournamentBattle
-import com.example.SPTJ_BD.model.TournamentNotFoundException
+import com.example.SPTJ_BD.model.exception.TournamentNotFoundException
 import com.example.SPTJ_BD.service.CharacterService
 import com.example.SPTJ_BD.service.TournamentService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -55,6 +58,37 @@ class TournamentController {
         tournamentService.getAllTournaments()
     }
 
+    @GetMapping("/{id}")
+    ResponseEntity getTournamentById(@PathVariable("id") Long id) {
+        try {
+            TournamentEntity tournamentEntity = tournamentService.getTournamentById(id)
+            return ResponseEntity.status(HttpStatus.OK).body(tournamentEntity)
+        } catch (TournamentNotFoundException exception) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body([error: exception.message])
+        }
+    }
+
+    @PutMapping("/{id}")
+    ResponseEntity updateTournament(@PathVariable("id") Long id, @RequestBody TournamentEntity tournamentEntity) {
+        try {
+            List<CharacterEntity> characters = characterService.getAllCharacters()
+            TournamentEntity updatedTournament = tournamentService.updateTournament(id, tournamentEntity, characters)
+            return ResponseEntity.status(HttpStatus.OK).body(updatedTournament)
+        } catch (TournamentNotFoundException exception) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body([error: exception.message])
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    ResponseEntity deleteTournament(@PathVariable("id") Long id) {
+        try {
+            TournamentEntity tournamentEntity = tournamentService.deleteTournament(id)
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(tournamentEntity)
+        } catch (TournamentNotFoundException exception) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body([error: exception.message])
+        }
+    }
+    
     @PostMapping("/{id}/start")
     ResponseEntity startTournament(@PathVariable("id") Long idTournament) {
         try {
