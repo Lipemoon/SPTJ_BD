@@ -1,8 +1,8 @@
 package com.example.SPTJ_BD.model.output
+
 import com.example.SPTJ_BD.entity.CharacterEntity
 
-class ResponseTournamentBattle {
-    String message
+class Battle1v1Status {
     CharacterEntity player1
     CharacterEntity player2
     String statusTournament

@@ -38,19 +38,19 @@ class TournamentEntity {
     @Column(nullable = true)
     Long winnerOfTournament
 
-    //@Column(nullable = true)
-    //Map<String, List<Long>> charactersTeam
-
-    //@Column(nullable = true)
-    //Map<String, List<Long>> charactersTeamWinnersOfRound
-
-    //@Column(nullable = true)
-    //Map<String, List<Long>> teamWinner
-
     @Column(nullable = false)
     Boolean matchIsStarted = false
 
     @Column(nullable = true)
     List<Long> charactersFighting = []
+
+    @Column(nullable = true)
+    List<Long> teams = []// Tem que ser o idTeam aqui do CharacterTeamEntity
+
+    @Column(nullable = true)
+    List<Long> teamWinnersOfRound = []// Tem que ser o idTeam aqui do CharacterTeamEntity
+
+    @Column(nullable = true)
+    Long teamWinner // Tem que ser o idTeamWinner do TournamentTeamWinnerEntity
 
 }

@@ -1,0 +1,19 @@
+meta {
+  name: UpdateCharacter
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:8080/sptj/characters/2
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Tenshinhan",
+    "gender": "M",
+    "gameOrigin": "Dragon Ball Fighter Z"
+  }
+}

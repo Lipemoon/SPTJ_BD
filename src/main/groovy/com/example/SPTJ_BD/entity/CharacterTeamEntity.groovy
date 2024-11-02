@@ -8,19 +8,17 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "SPTJ_Character")
-class CharacterEntity {
+@Table(name = "SPTJ_teamCharacters")
+class CharacterTeamEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id
+    Long idTeam
 
     @Column(nullable = false)
-    String name
-
-    @Column(nullable = false, length = 1)
-    String gender
+    List<Long> characters = []
 
     @Column(nullable = false)
-    String gameOrigin
+    Long idTournament // Tem que ser o id do TournamentEntity
 
 }
