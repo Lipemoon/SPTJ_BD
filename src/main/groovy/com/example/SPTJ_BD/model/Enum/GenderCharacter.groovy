@@ -1,4 +1,4 @@
-package com.example.SPTJ_BD.model
+package com.example.SPTJ_BD.model.Enum
 
 enum GenderCharacter {
     M("M"),

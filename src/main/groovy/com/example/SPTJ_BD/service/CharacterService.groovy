@@ -1,7 +1,7 @@
 package com.example.SPTJ_BD.service
 
 import com.example.SPTJ_BD.entity.CharacterEntity
-import com.example.SPTJ_BD.model.GenderCharacter
+import com.example.SPTJ_BD.model.Enum.GenderCharacter
 import com.example.SPTJ_BD.model.exception.CharacterNotFoundException
 import com.example.SPTJ_BD.model.exception.InvalidGenderException
 import com.example.SPTJ_BD.repository.CharacterRepository

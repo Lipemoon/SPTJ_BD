@@ -1,5 +1,5 @@
 package com.example.SPTJ_BD.entity
-import com.example.SPTJ_BD.model.StatusTournament
+import com.example.SPTJ_BD.model.Enum.StatusTournament
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -8,8 +8,9 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "SPTJ_Tournament")
+@Table(name = "Tournament")
 class TournamentEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id
@@ -45,12 +46,12 @@ class TournamentEntity {
     List<Long> charactersFighting = []
 
     @Column(nullable = true)
-    List<Long> teams = []// Tem que ser o idTeam aqui do CharacterTeamEntity
+    List<Long> teams = []
 
     @Column(nullable = true)
-    List<Long> teamWinnersOfRound = []// Tem que ser o idTeam aqui do CharacterTeamEntity
+    List<Long> teamWinnersOfRound = []
 
     @Column(nullable = true)
-    Long teamWinner // Tem que ser o idTeamWinner do TournamentTeamWinnerEntity
+    Long teamWinner
 
 }

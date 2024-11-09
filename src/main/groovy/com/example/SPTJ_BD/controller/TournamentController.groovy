@@ -1,6 +1,9 @@
 package com.example.SPTJ_BD.controller
 import com.example.SPTJ_BD.entity.CharacterEntity
 import com.example.SPTJ_BD.entity.TournamentEntity
+import com.example.SPTJ_BD.model.exception.TournamentAlreadyStartedException
+import com.example.SPTJ_BD.model.exception.TournamentNotStartedException
+import com.example.SPTJ_BD.model.input.TournamentFinalizedInput
 import com.example.SPTJ_BD.model.exception.InvalidFormatTournamentException
 import com.example.SPTJ_BD.model.exception.InvalidGenderException
 import com.example.SPTJ_BD.model.output.ResponseChooseWinner
@@ -52,6 +55,19 @@ class TournamentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
         }
     }
+
+    @PostMapping("/finished")
+    ResponseEntity registerTournamentFinished(@RequestBody TournamentFinalizedInput input) {
+        try {
+            TournamentEntity tournamentEntity = tournamentService.registerTournamentFinalized(input)
+            return ResponseEntity.status(HttpStatus.CREATED).body(tournamentEntity)
+        } catch (InvalidGenderException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
+        } catch (InvalidFormatTournamentException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
+        }
+    }
+
 
     @GetMapping
     List<TournamentEntity> getAllTournaments() {
@@ -108,7 +124,7 @@ class TournamentController {
             return ResponseEntity.status(HttpStatus.OK).body(responseTournament)
         } catch (TournamentNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
-        } catch (RuntimeException exception) {
+        } catch (TournamentAlreadyStartedException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
         }
     }
@@ -120,7 +136,7 @@ class TournamentController {
             return ResponseEntity.status(HttpStatus.OK).body(responseTournamentBattle)
         } catch (TournamentNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
-        } catch (RuntimeException exception) {
+        } catch (TournamentNotStartedException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
         } catch (InvalidFormatTournamentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
