@@ -6,5 +6,4 @@ class TournamentFinalizedInput {
     String categoryByGenre
     String format
     List<Long> idCharacterWinner
-
 }

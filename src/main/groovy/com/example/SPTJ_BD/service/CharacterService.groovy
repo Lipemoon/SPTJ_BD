@@ -56,7 +56,7 @@ class CharacterService {
         CharacterEntity characterEntity = characterRepository.findById(id).orElseThrow {
             new CharacterNotFoundException("Character not found with id: $id")
         }
-        characterRepository.save(characterEntity)
+        characterRepository.delete(characterEntity)
     }
 
 }

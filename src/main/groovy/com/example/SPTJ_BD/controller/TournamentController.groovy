@@ -1,7 +1,10 @@
 package com.example.SPTJ_BD.controller
 import com.example.SPTJ_BD.entity.CharacterEntity
 import com.example.SPTJ_BD.entity.TournamentEntity
+import com.example.SPTJ_BD.model.exception.CharactersAreNotFightingException
+import com.example.SPTJ_BD.model.exception.TournamentAlreadyFinishedException
 import com.example.SPTJ_BD.model.exception.TournamentAlreadyStartedException
+import com.example.SPTJ_BD.model.exception.TournamentMatchIsStartedException
 import com.example.SPTJ_BD.model.exception.TournamentNotStartedException
 import com.example.SPTJ_BD.model.input.TournamentFinalizedInput
 import com.example.SPTJ_BD.model.exception.InvalidFormatTournamentException
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+
 //Todo - Fazer no Banco de Dados postgre:
 //Todo - Inserir 10 registros ou mais e mostrar como que faz para mostrar um que tenha um id especifico
 //Todo - Como fazer para mostrar onde tem um tipo ou outro tipo
@@ -68,7 +72,6 @@ class TournamentController {
         }
     }
 
-
     @GetMapping
     List<TournamentEntity> getAllTournaments() {
         tournamentService.getAllTournaments()
@@ -96,16 +99,16 @@ class TournamentController {
 //        }
 //    }
 
-    @PutMapping("/{id}")
-    ResponseEntity updateTournament(@PathVariable("id") Long id, @RequestBody TournamentEntity tournamentEntity) {
-        try {
-            List<CharacterEntity> characters = characterService.getAllCharacters()
-            TournamentEntity updatedTournament = tournamentService.updateTournament(id, tournamentEntity, characters)
-            return ResponseEntity.status(HttpStatus.OK).body(updatedTournament)
-        } catch (TournamentNotFoundException exception) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body([error: exception.message])
-        }
-    }
+//    @PutMapping("/{id}")
+//    ResponseEntity updateTournament(@PathVariable("id") Long id, @RequestBody TournamentEntity tournamentEntity) {
+//        try {
+//            List<CharacterEntity> characters = characterService.getAllCharacters()
+//            TournamentEntity updatedTournament = tournamentService.updateTournament(id, tournamentEntity, characters)
+//            return ResponseEntity.status(HttpStatus.OK).body(updatedTournament)
+//        } catch (TournamentNotFoundException exception) {
+//            ResponseEntity.status(HttpStatus.NOT_FOUND).body([error: exception.message])
+//        }
+//    }
 
     @DeleteMapping("/{id}")
     ResponseEntity deleteTournament(@PathVariable("id") Long id) {
@@ -140,6 +143,8 @@ class TournamentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
         } catch (InvalidFormatTournamentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
+        } catch (TournamentMatchIsStartedException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
         }
     }
 
@@ -150,26 +155,32 @@ class TournamentController {
             return ResponseEntity.status(HttpStatus.OK).body(responseChooseWinner)
         } catch (TournamentNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
-        } catch (RuntimeException exception) {
+        } catch (TournamentNotStartedException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
+        } catch (TournamentAlreadyFinishedException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
+        } catch (CharactersAreNotFightingException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
         }
     }
 
-    @PostMapping("/team/{id}/startMatch")
+    @PostMapping("/teams/{id}/startMatch")
     ResponseEntity startMatchOfTournamentTeam(@PathVariable("id") Long idTournament) {
         try {
             ResponseTournamentBattleTeam responseTournamentBattleTeam = tournamentService.startMatchOfTournamentTeam(idTournament)
             return ResponseEntity.status(HttpStatus.OK).body(responseTournamentBattleTeam)
+        } catch (InvalidFormatTournamentException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
         } catch (TournamentNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
-        } catch (RuntimeException exception) {
+        } catch (TournamentNotStartedException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
-        } catch (InvalidFormatTournamentException exception) {
+        } catch (TournamentMatchIsStartedException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
         }
     }
 
-    @PostMapping("/team/{idTournament}/chooseWinner/{idTeam}")
+    @PostMapping("/teams/{idTournament}/chooseWinner/{idTeam}")
     ResponseEntity chooseWinnerOfMatchTeam(@PathVariable("idTournament") Long idTournament, @PathVariable("idTeam") Long idTeam) {
         try {
             ResponseChooseWinner responseChooseWinner = tournamentService.chooseWinnerOfMatchTeam(idTournament, idTeam)
@@ -177,6 +188,8 @@ class TournamentController {
         } catch (TournamentNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
         } catch (InvalidFormatTournamentException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
+        } catch (CharactersAreNotFightingException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body([error: exception.getMessage()])
         }
     }
