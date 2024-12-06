@@ -17,7 +17,7 @@ class CharacterEntity {
     @Column(nullable = false)
     String name
 
-    @Column(nullable = false, length = 1)
+    @Column(nullable = false)
     String gender
 
     @Column(nullable = false)

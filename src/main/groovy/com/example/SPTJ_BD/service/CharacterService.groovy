@@ -46,9 +46,18 @@ class CharacterService {
         CharacterEntity updateCharacter = characterRepository.findById(id).orElseThrow {
             new CharacterNotFoundException("Character not found with id: $id")
         }
-        updateCharacter.name = characterEntity.name
-        updateCharacter.gender = characterEntity.gender
-        updateCharacter.gameOrigin = characterEntity.gameOrigin
+        if(!characterEntity.name.isEmpty()) {
+            updateCharacter.name = characterEntity.name
+        }
+        if (!characterEntity.gender.isEmpty()) {
+            updateCharacter.gender = characterEntity.gender
+        }
+        if (!characterEntity.gameOrigin.isEmpty()) {
+            updateCharacter.gameOrigin = characterEntity.gameOrigin
+        }
+        //if (!characterEntity.foto.isEmpty()) {
+            //updateCharacter.foto = characterEntity.foto
+        //}
         characterRepository.save(updateCharacter)
     }
 

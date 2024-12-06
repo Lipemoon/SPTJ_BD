@@ -51,18 +51,12 @@ class TournamentService {
         return tournamentRepository.findAll()
     }
 
-    TournamentEntity createTournament(TournamentEntity tournamentEntity, List<CharacterEntity> characters) {
+    TournamentEntity createTournament(TournamentEntity tournamentEntity) {
         if (genderTournamentIsInvalid(tournamentEntity)) {
             throw new InvalidGenderException("Gender of Tournament is Invalid!")
         }
         if (formatTournamentIsInvalid(tournamentEntity)) {
             throw new InvalidFormatTournamentException("Format of Tournament is Invalid!")
-        }
-        if (tournamentEntity.format == FormatTournament.ONE_VS_ONE.getCode()) {
-            addCharactersTournament1v1(tournamentEntity, characters)
-        } else {
-            tournamentRepository.save(tournamentEntity)
-            addCharactersTournamentTeam(tournamentEntity, characters)
         }
         tournamentRepository.save(tournamentEntity)
     }
@@ -104,21 +98,27 @@ class TournamentService {
 //        }
 //    }
 
-//    TournamentEntity updateTournament(Long id, TournamentEntity tournamentEntity, List<CharacterEntity> characters) {
-//        TournamentEntity updateTournament = tournamentRepository.findById(id).orElseThrow {
-//            new TournamentNotFoundException("Tournament not found with id $id")
-//        }
-//        updateTournament.name = tournamentEntity.name
-//        updateTournament.gameOrigin = tournamentEntity.gameOrigin
-//        updateTournament.categoryByGenre = tournamentEntity.categoryByGenre
-//        updateTournament.format = tournamentEntity.format
-//        if (updateTournament.format == FormatTournament.ONE_VS_ONE.getCode()) {
-//            addCharactersTournament1v1(tournamentEntity, characters)
-//        } else {
-//            addCharactersTournamentTeam(tournamentEntity, characters)
-//        }
-//        tournamentRepository.save(updateTournament)
-//    }
+    TournamentEntity updateTournament(Long id, TournamentEntity tournamentEntity) {
+        TournamentEntity updateTournament = tournamentRepository.findById(id).orElseThrow {
+            new TournamentNotFoundException("Tournament not found with id $id")
+        }
+        if (!tournamentEntity.name.isEmpty()) {
+            updateTournament.name = tournamentEntity.name
+        }
+        if (!tournamentEntity.gameOrigin.isEmpty()) {
+            updateTournament.gameOrigin = tournamentEntity.gameOrigin
+        }
+        if (!tournamentEntity.categoryByGenre.isEmpty()) {
+            updateTournament.categoryByGenre = tournamentEntity.categoryByGenre
+        }
+        if (!tournamentEntity.format.isEmpty()) {
+            updateTournament.format = tournamentEntity.format
+        }
+//      if (!tournamentEntity.foto.isEmpty()) {
+//          updateTournament.foto = tournamentEntity.foto
+//      }
+        tournamentRepository.save(updateTournament)
+    }
 
     void deleteTournament(Long id) {
         TournamentEntity tournamentEntity = tournamentRepository.findById(id).orElseThrow {
@@ -127,11 +127,16 @@ class TournamentService {
         tournamentRepository.delete(tournamentEntity)
     }
 
-    ResponseTournament startTournament(Long idTournament) {
+    ResponseTournament startTournament(Long idTournament, List<CharacterEntity> characters) {
         TournamentEntity tournamentEntity = tournamentRepository.findById(idTournament).orElseThrow {
             new TournamentNotFoundException("Tournament not found with id: $idTournament")
         }
         if (tournamentIsNotStarted(tournamentEntity)) {
+            if (tournamentEntity.format == FormatTournament.ONE_VS_ONE.getCode()) {
+                addCharactersTournament1v1(tournamentEntity, characters)
+            } else {
+                addCharactersTournamentTeam(tournamentEntity, characters)
+            }
             tournamentEntity.status = StatusTournament.TOURNAMENT_STARTED.getCode()
             tournamentRepository.save(tournamentEntity)
             return new ResponseTournament(message: "Tournament Started of Success!",
@@ -159,7 +164,7 @@ class TournamentService {
                 Battle1v1Status battleStatus = start1v1Battle(tournamentEntity)
                 if (tournamentIsFinished(tournamentEntity)) {
                     CharacterEntity characterEntity = characterRepository.findById(tournamentEntity.winnerOfTournament).get()
-                    return new ResponseTournamentBattle1v1(message: "Tournament Finished, Winner" +
+                    return new ResponseTournamentBattle1v1(message: "Tournament Finished, Winner " +
                             "${characterEntity.name}", player1: null,
                             player2: null, statusTournament: tournamentEntity.status)
                 } else {
@@ -209,27 +214,29 @@ class TournamentService {
             new TournamentNotFoundException("Tournament not found with id: $idTournament")
         }
         if (tournamentEntity.format == FormatTournament.TWO_VS_TWO.getCode() ||
-                tournamentEntity.format == FormatTournament.THREE_VS_THREE.getCode()) {
+                tournamentEntity.format == FormatTournament.THREE_VS_THREE.getCode() ||
+                tournamentEntity.format == FormatTournament.FOUR_VS_FOUR.getCode() ||
+                tournamentEntity.format == FormatTournament.FIVE_VS_FIVE.getCode()) {
             for (Long idTeams : tournamentEntity.charactersFighting.findAll()) {
                 if (idTeams == idTeam) {
                     List<CharacterEntity> charactersEntity = verificarPersonagensTorneioTeam(tournamentEntity, idTeam)
                     if (tournamentEntity.format == FormatTournament.TWO_VS_TWO.getCode()) {
                         tournamentRepository.save(tournamentEntity)
-                        return new ResponseChooseWinner(message: "Time com os Personagens" +
+                        return new ResponseChooseWinner(message: "Time com os Personagens: " +
                                 "${charactersEntity.name.get(0)} e ${charactersEntity.name.get(1)} ganharam!")
                     } else if (tournamentEntity.format == FormatTournament.THREE_VS_THREE.getCode()) {
                         tournamentRepository.save(tournamentEntity)
-                        return new ResponseChooseWinner(message: "Time com os Personagens" +
+                        return new ResponseChooseWinner(message: "Time com os Personagens: " +
                                 "${charactersEntity.name.get(0)}, ${charactersEntity.name.get(1)} e " +
                                 "${charactersEntity.name.get(2)} ganharam!")
                     } else if (tournamentEntity.format == FormatTournament.FOUR_VS_FOUR.getCode()) {
                         tournamentRepository.save(tournamentEntity)
-                        return new ResponseChooseWinner(message: "Time com os Personagens" +
+                        return new ResponseChooseWinner(message: "Time com os Personagens: " +
                                 "${charactersEntity.name.get(0)}, ${charactersEntity.name.get(1)}, " +
                                 "${charactersEntity.name.get(2)} e ${charactersEntity.name.get(3)} ganharam!")
                     } else {
                         tournamentRepository.save(tournamentEntity)
-                        return new ResponseChooseWinner(message: "Time com os Personagens" +
+                        return new ResponseChooseWinner(message: "Time com os Personagens: " +
                                 "${charactersEntity.name.get(0)}, ${charactersEntity.name.get(1)}, " +
                                 "${charactersEntity.name.get(2)}, ${charactersEntity.name.get(3)} " +
                                 "e ${charactersEntity.name.get(4)} ganharam!")
@@ -246,7 +253,7 @@ class TournamentService {
         for (CharacterEntity character : characters) {
             if (character.gameOrigin == tournamentEntity.gameOrigin && character.gender == tournamentEntity.categoryByGenre) {
                 tournamentEntity.characters.add(character.id)
-            } else if (character.gameOrigin == tournamentEntity.gameOrigin && tournamentEntity.categoryByGenre == GenderTournament.M_F.getCode() || tournamentEntity.categoryByGenre == GenderTournament.F_M.getCode()) {
+            } else if (character.gameOrigin == tournamentEntity.gameOrigin && tournamentEntity.categoryByGenre == GenderTournament.M_F.getCode()) {
                 tournamentEntity.characters.add(character.id)
             }
         }
@@ -290,7 +297,7 @@ class TournamentService {
         for (CharacterEntity character : characters) {
             if (character.gameOrigin == tournamentEntity.gameOrigin && character.gender == tournamentEntity.categoryByGenre) {
                 charactersTournaments.add(character.id)
-            } else if (character.gameOrigin == tournamentEntity.gameOrigin && tournamentEntity.categoryByGenre == GenderTournament.M_F.getCode() || tournamentEntity.categoryByGenre == GenderTournament.F_M.getCode()) {
+            } else if (character.gameOrigin == tournamentEntity.gameOrigin && tournamentEntity.categoryByGenre == GenderTournament.M_F.getCode()) {
                 charactersTournaments.add(character.id)
             }
         }
@@ -374,7 +381,7 @@ class TournamentService {
         Map<Long, List<CharacterEntity>> team1 = pegarAleatorioTeam1ParaBatalhar(tournamentEntity)
         Map<Long, List<CharacterEntity>> team2 = pegarAleatorioTeam2ParaBatalhar(tournamentEntity)
         tournamentEntity.matchIsStarted = true
-        tournamentEntity.status == StatusTournament.TOURNAMENT_PROGRESS.getCode()
+        tournamentEntity.status = StatusTournament.TOURNAMENT_PROGRESS.getCode()
         tournamentRepository.save(tournamentEntity)
         return new BattleTeamStatus(team1: team1, team2: team2, statusTournament: tournamentEntity.status)
     }
@@ -385,6 +392,9 @@ class TournamentService {
         Long quantidade = descobrirFormatoTorneio(tournamentEntity)
         Long id = tournamentEntity.teams.get(random.nextInt(tournamentEntity.teams.size()))
         CharacterTeamEntity characterTeam = characterTeamRepository.findById(id).get()
+        if (characterTeam.characters.size() < quantidade) {
+            quantidade = characterTeam.characters.size()
+        }
         for (int i = 0; i < quantidade; i++) {
             Long idCharacter = characterTeam.characters.get(i)
             CharacterEntity characterEntity = characterRepository.findById(idCharacter).get()
@@ -402,6 +412,9 @@ class TournamentService {
         Long quantidade = descobrirFormatoTorneio(tournamentEntity)
         Long id = tournamentEntity.teams.get(random.nextInt(tournamentEntity.teams.size()))
         CharacterTeamEntity characterTeam = characterTeamRepository.findById(id).get()
+        if (characterTeam.characters.size() < quantidade) {
+            quantidade = characterTeam.characters.size()
+        }
         for (int i = 0; i < quantidade; i++) {
             Long idCharacter = characterTeam.characters.get(i)
             CharacterEntity characterEntity = characterRepository.findById(idCharacter).get()
@@ -416,7 +429,6 @@ class TournamentService {
     private static boolean genderTournamentIsInvalid(TournamentEntity tournamentEntity) {
         if (tournamentEntity.categoryByGenre != GenderTournament.F.getCode() &&
                 tournamentEntity.categoryByGenre != GenderTournament.M.getCode() &&
-                tournamentEntity.categoryByGenre != GenderTournament.F_M.getCode() &&
                 tournamentEntity.categoryByGenre != GenderTournament.M_F.getCode()) {
             return true
         }

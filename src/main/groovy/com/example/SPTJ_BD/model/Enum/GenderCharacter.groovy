@@ -1,8 +1,8 @@
 package com.example.SPTJ_BD.model.Enum
 
 enum GenderCharacter {
-    M("M"),
-    F("F")
+    M("Masculino"),
+    F("Feminino")
 
     private final String code
 

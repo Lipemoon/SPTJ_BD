@@ -21,7 +21,7 @@ class TournamentEntity {
     @Column(nullable = false)
     String gameOrigin
 
-    @Column(nullable = false, length = 3)
+    @Column(nullable = false)
     String categoryByGenre
 
     @Column(nullable = false, length = 3)
